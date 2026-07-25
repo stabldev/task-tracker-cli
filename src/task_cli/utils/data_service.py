@@ -1,5 +1,8 @@
 import json
+from collections.abc import Iterable
 from pathlib import Path
+
+from task_cli.utils.types import Task
 
 
 class DataService:
@@ -9,11 +12,18 @@ class DataService:
         if not self.data_path.exists():
             self.data_path.write_text(json.dumps([]))
 
-    def write(self, data: str) -> None:
+    def _write(self, data: str) -> None:
         with open(self.data_path, "w", encoding="utf-8") as file:
             file.write(data)
 
-    def read(self) -> str:
+    def _read(self) -> str:
         with open(self.data_path) as file:
             data = file.read()
             return data
+
+    def read_tasks(self) -> list[Task]:
+        return [Task(**item) for item in json.loads(self._read())]
+
+    def write_tasks(self, tasks: Iterable[Task]) -> None:
+        tasks_str = json.dumps(tasks, default=str, indent=2)
+        self._write(tasks_str)
