@@ -2,6 +2,7 @@ import argparse
 
 from task_cli.commands.add import handle_add_task
 from task_cli.commands.delete import handle_delete_task
+from task_cli.commands.list import handle_list_tasks
 from task_cli.commands.mark_done import handle_mark_done_task
 from task_cli.commands.mark_in_progress import handle_mark_in_progress_task
 from task_cli.commands.update import handle_update_task
@@ -40,6 +41,10 @@ def main() -> None:
     mark_done_parser = subparsers.add_parser("mark-done", help="Mark a task as done.")
     mark_done_parser.add_argument("id", type=int, help="ID of the task.")
     mark_done_parser.set_defaults(func=handle_mark_done_task)
+
+    # "list" command
+    list_parser = subparsers.add_parser("list", help="List tasks.")
+    list_parser.set_defaults(func=handle_list_tasks)
 
     args = parser.parse_args()
     args.func(args)
