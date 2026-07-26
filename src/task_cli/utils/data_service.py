@@ -1,8 +1,9 @@
 import json
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Unpack
 
-from task_cli.utils.types import Task
+from task_cli.utils.types import Task, TaskUpdate
 
 
 class DataService:
@@ -22,3 +23,13 @@ class DataService:
         tasks_str = json.dumps(tasks, default=str, indent=2)
         with open(self.data_path, "w", encoding="utf-8") as file:
             file.write(tasks_str)
+
+    def update_task(self, id: int, **kwargs: Unpack[TaskUpdate]) -> None:
+        tasks = self.read_tasks()
+        task_to_update = next((task for task in tasks if task["id"] == id), None)
+
+        if task_to_update is None:
+            raise RuntimeError("Task not found. Please provide correct ID.")
+
+        task_to_update.update(**kwargs)
+        self.write_tasks(tasks)

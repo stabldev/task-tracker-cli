@@ -2,6 +2,7 @@ import argparse
 
 from task_cli.commands.add import handle_add_task
 from task_cli.commands.delete import handle_delete_task
+from task_cli.commands.mark_in_progress import handle_mark_in_progress_task
 from task_cli.commands.update import handle_update_task
 
 
@@ -26,6 +27,13 @@ def main() -> None:
     delete_parser = subparsers.add_parser("delete", help="Delete a task.")
     delete_parser.add_argument("id", type=int, help="ID of the task.")
     delete_parser.set_defaults(func=handle_delete_task)
+
+    # "mark-in-progress" command
+    mark_in_progress_parser = subparsers.add_parser(
+        "mark-in-progress", help="Mark a task as in progress."
+    )
+    mark_in_progress_parser.add_argument("id", type=int, help="ID of the task.")
+    mark_in_progress_parser.set_defaults(func=handle_mark_in_progress_task)
 
     args = parser.parse_args()
     args.func(args)
