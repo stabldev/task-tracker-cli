@@ -44,6 +44,12 @@ def main() -> None:
 
     # "list" command
     list_parser = subparsers.add_parser("list", help="List tasks.")
+    list_parser.add_argument(
+        "status",
+        nargs="?",
+        choices=["todo", "in-progress", "done"],
+        help="Filter tasks by status.",
+    )
     list_parser.set_defaults(func=handle_list_tasks)
 
     args = parser.parse_args()
