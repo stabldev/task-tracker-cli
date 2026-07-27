@@ -9,8 +9,7 @@ from task_cli.utils.types import Task, TaskUpdate
 
 class DataService:
     def __init__(self):
-        base_path = Path(__file__).resolve().parent.parent.parent.parent
-        self.data_path = base_path / "data.json"
+        self.data_path = Path.cwd() / "data.json"
         if not self.data_path.exists():
             self.data_path.write_text(json.dumps([]))
 
