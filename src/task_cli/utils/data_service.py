@@ -1,5 +1,6 @@
 import json
 from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Unpack
 
@@ -32,4 +33,5 @@ class DataService:
             raise RuntimeError("Task not found. Please provide correct ID.")
 
         task_to_update.update(**kwargs)
+        task_to_update["updated_at"] = datetime.now(UTC)
         self.write_tasks(tasks)
