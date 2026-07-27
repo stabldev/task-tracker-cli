@@ -9,7 +9,7 @@ def handle_add_task(args) -> None:
     tasks_list = ds.read_tasks()
 
     new_task = Task(
-        id=len(tasks_list) + 1,
+        id=max((task["id"] for task in tasks_list), default=0) + 1,
         description=args.description,
         status="todo",
         created_at=datetime.now(UTC),
