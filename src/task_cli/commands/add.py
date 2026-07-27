@@ -9,7 +9,7 @@ def handle_add_task(args) -> None:
     tasks_list = ds.read_tasks()
 
     new_task = Task(
-        id=max((task["id"] for task in tasks_list), default=0) + 1,
+        id=max((task.id for task in tasks_list), default=0) + 1,
         description=args.description,
         status="todo",
         created_at=datetime.now(UTC),
@@ -19,4 +19,4 @@ def handle_add_task(args) -> None:
     tasks_list.append(new_task)
     ds.write_tasks(tasks_list)
 
-    print(f"Task added successfully: {new_task['id']}")
+    print(f"Task added successfully: {new_task.id}")
