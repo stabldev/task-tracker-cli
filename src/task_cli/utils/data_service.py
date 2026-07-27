@@ -1,9 +1,13 @@
 import json
-from collections.abc import Iterable
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Unpack
 
+from pydantic import TypeAdapter
+
 from task_cli.utils.types import Task, TaskUpdate
+
+task_list_adapter = TypeAdapter(list[Task])
 
 
 class DataService:
@@ -13,22 +17,31 @@ class DataService:
             self.data_path.write_text(json.dumps([]))
 
     def read_tasks(self) -> list[Task]:
-        with open(self.data_path) as file:
-            data = file.read()
+        return task_list_adapter.validate_json(
+            self.data_path.read_text(encoding="utf-8")
+        )
 
-        return [Task.from_dict(item) for item in json.loads(data)]
-
-    def write_tasks(self, tasks: Iterable[Task]) -> None:
-        tasks_data = [task.to_dict() for task in tasks]
-        with open(self.data_path, "w", encoding="utf-8") as file:
-            json.dump(tasks_data, file, default=str, indent=2)
+    def write_tasks(self, tasks: list[Task]) -> None:
+        json_bytes = task_list_adapter.dump_json(tasks, indent=2)
+        self.data_path.write_bytes(json_bytes)
 
     def update_task(self, id: int, **kwargs: Unpack[TaskUpdate]) -> None:
         tasks = self.read_tasks()
-        task_to_update = next((task for task in tasks if task.id == id), None)
 
-        if task_to_update is None:
-            raise RuntimeError("Task not found. Please provide correct ID.")
+        for i, task in enumerate(tasks):
+            if task.id != id:
+                continue
 
-        task_to_update.update(**kwargs)
-        self.write_tasks(tasks)
+            updates = {}
+            if (description := kwargs.get("description")) is not None:
+                updates["description"] = description
+            if (status := kwargs.get("status")) is not None:
+                updates["status"] = status
+
+            updates["updated_at"] = datetime.now(UTC)
+
+            tasks[i] = task.model_copy(update=updates)
+            self.write_tasks(tasks)
+            return
+
+        raise RuntimeError("Task not found. Please provide correct ID.")
